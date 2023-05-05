@@ -1,0 +1,12 @@
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.csproj.AssemblyReference.cache
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.AssemblyInfoInputs.cache
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.AssemblyInfo.cs
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.csproj.CoreCompileInputs.cache
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\bin\Debug\netstandard2.0\EmoteDebug.deps.json
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\bin\Debug\netstandard2.0\EmoteDebug.dll
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\bin\Debug\netstandard2.0\EmoteDebug.pdb
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.dll
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.pdb
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\bin\Debug\netstandard2.0\CustomEmotesAPI.dll
+C:\Users\Bigma Male\Documents\EmoteDebugCommands\ExamplePlugin\obj\Debug\netstandard2.0\EmoteDebug.csproj.CopyComplete

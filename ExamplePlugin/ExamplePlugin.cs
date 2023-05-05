@@ -16,143 +16,229 @@ namespace ExamplePlugin
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     public class ExamplePlugin : BaseUnityPlugin
     {
-        public const string PluginGUID = "com.weliveinasociety.ExampleEmotes";
+        public const string PluginGUID = "com.weliveinasociety.EmoteDebugCommands";
         public const string PluginAuthor = "Nunchuk";
-        public const string PluginName = "Example Emotes";
+        public const string PluginName = "Emote Debug Commands";
         public const string PluginVersion = "1.0.0";
 
         public static ConfigEntry<KeyboardShortcut> TPoseButton;
-        string currentAnim = "";
         public void Awake()
         {
-            TPoseButton = Config.Bind<KeyboardShortcut>("Controls", "T-Pose Button", new KeyboardShortcut(KeyCode.T), "Hold to T-Pose");
-            ModSettingsManager.AddOption(new KeyBindOption(TPoseButton));
-            Assets.AddBundle($"example_emotes");
-            ModSettingsManager.SetModIcon(Assets.Load<Sprite>("@ExampleEmotePlugin_example_emotes:assets/icon.png"));
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@ExampleEmotePlugin_example_emotes:assets/backflip.anim"), false); //Most standard emote here, non-looping, no sounds
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@ExampleEmotePlugin_example_emotes:assets/t pose.anim"), true, visible: false); //Similar to previous, but this is a looping emote which is also hidden from the regular emote picker. Has to be invoked from a function as shown below.
-            CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged; //Lets you know when a new emote is played and it's name
-            CustomEmotesAPI.emoteSpotJoined_Body += CustomEmotesAPI_emoteSpotJoined_Body;
-            CustomEmotesAPI.emoteSpotJoined_Prop += CustomEmotesAPI_emoteSpotJoined_Prop;
-            //CustomEmotesAPI.CreateNameTokenSpritePair("customSurvivorNameToken", sprite);    For the circle in the middle when you are choosing an emote. 
-
-
-
-            //CustomEmotesAPI.GetLocalBodyAnimationClip()      If you don't wanna just use the hook used above.
-
-
-            //https://youtu.be/c_G3G4RzCFA        a walkthrough of importing a bodyprefab into game. All vanilla survivors are already imported, this is for modded characters
-            //If you want to import your custom survivor so it can use the emotes. bodyPrefab is just that. underskeleton is essentially a copy of the skeleton from the bodyPrefab except it HAS to be a humanoid skeleton in unity.
-            //I know this one is weird, feel free to @ me in discord if you need help with this. You will need access to the bodyPrefab used in game and we should be able to go from there.    
-            //On.RoR2.SurvivorCatalog.Init += (orig) =>      
-            //{
-            //    orig();
-            //    foreach (var item in SurvivorCatalog.allSurvivorDefs)
-            //    {
-            //        DebugClass.Log($"----------bodyprefab: [{item.bodyPrefab}]");
-            //        if (item.bodyPrefab.name == "MageBody")
-            //        {
-            //            var skele = Assets.Load<GameObject>("@ExampleEmotePlugin_example_emotes:assets/artificer.prefab");
-            //            CustomEmotesAPI.ImportArmature(item.bodyPrefab, underskeleton);
-            //        }
-            //    }
-            //};
-
-
-
-
-            //more examples here, animation setup from moisture upset. Some stuff here will cause errors due to missing resources so leave it commented
-            /*
-
-
-
-
-            You can declare parts of a humanoid body. Insert these declared parts into a function and you can have bones be ignored by animations, like if you have an upper-body only animation
-            HumanBodyBones[] upperLegs = new HumanBodyBones[] { HumanBodyBones.LeftUpperLeg, HumanBodyBones.RightUpperLeg };
-            HumanBodyBones[] hips = new HumanBodyBones[] { HumanBodyBones.Hips };
-            HumanBodyBones[] Facepalm = new HumanBodyBones[] { HumanBodyBones.LeftUpperLeg, HumanBodyBones.RightUpperLeg, HumanBodyBones.LeftUpperArm };
-
-
-
-            Yes, we use wwise here :)
-            EnemyReplacements.LoadBNK("Emotes");
-            
-
-
-
-            Loser anim, loops first anim, wwise start event, wwise stop event, dims audio when close
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Loser.anim"), true, "Loser", "LoserStop", dimWhenClose: true);
-            
-            
-            
-            Headspin anim, doesn't loop first anim, secondary anim which loops
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/HeadSpin.anim"), false, secondaryAnimation: Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/headspinloop.anim"));
-            
-            
-            
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Dab.anim"), false, "Dab", "DabStop", upperLegs, hips);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Floss.anim"), true, "Floss", "FlossStop", dimWhenClose: true);
-            I do this one differently because I'm special
-            var test = Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Default Dance.anim");
-            CustomEmotesAPI.AddCustomAnimation(test, false, "DefaultDance", "DefaultDanceStop", dimWhenClose: true);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Facepalm.anim"), false, "", "", Facepalm, hips);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/Orange Justice.anim"), true, "OrangeJustice", "OrangeJusticeStop", dimWhenClose: true);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/nobones.anim"), true);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/ThumbsUp.anim"), false, rootBonesToIgnore: upperLegs, soloBonesToIgnore: hips);
-            CustomEmotesAPI.AddCustomAnimation(Assets.Load<AnimationClip>("@MoistureUpset_moisture_animationreplacements:assets/animationreplacements/ThumbsDown.anim"), false, rootBonesToIgnore: upperLegs, soloBonesToIgnore: hips);
-             */
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyHonda");
+            CustomEmotesAPI.BlackListEmote("EnemyHonda");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyDodge");
+            CustomEmotesAPI.BlackListEmote("EnemyDodge");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyStand");
+            CustomEmotesAPI.BlackListEmote("EnemyStand");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyJoin");
+            CustomEmotesAPI.BlackListEmote("EnemyJoin");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyRPS");
+            CustomEmotesAPI.BlackListEmote("EnemyRPS");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyConga");
+            CustomEmotesAPI.BlackListEmote("EnemyConga");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyNone");
+            CustomEmotesAPI.BlackListEmote("EnemyNone");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyGetDown");
+            CustomEmotesAPI.BlackListEmote("EnemyGetDown");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyBreak");
+            CustomEmotesAPI.BlackListEmote("EnemyBreak");
+            CustomEmotesAPI.AddNonAnimatingEmote("SpawnBody");
+            CustomEmotesAPI.BlackListEmote("SpawnBody");
+            CustomEmotesAPI.AddNonAnimatingEmote("EnemyKazotsky");
+            CustomEmotesAPI.BlackListEmote("EnemyKazotsky");
+            CustomEmotesAPI.animChanged += CustomEmotesAPI_animChanged;
         }
 
-        private void CustomEmotesAPI_emoteSpotJoined_Prop(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
+        void DEBUGHANDLE(BoneMapper mapper, string newAnimation)
         {
-            //does nothing, just putting this here to show that you can do it
-        }
+            if (mapper.worldProp)
+            {
+                return;
+            }
+            if (newAnimation == "EnemyHonda")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("HondaStep", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyKazotsky")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("Kazotsky Kick", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyNone")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("none", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyConga")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("Conga", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyRPS")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("Rock Paper Scissors", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyJoin")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    BoneMapper nearestMapper = null;
+                    if (item.transform.parent.GetComponent<CharacterModel>().body.masterObject?.GetComponent<PlayerCharacterMasterController>() == null)
+                    {
+                        if (item.currentEmoteSpot)
+                        {
+                            item.JoinEmoteSpot();
+                        }
+                        else
+                        {
+                            foreach (var otherMapper in CustomEmotesAPI.GetAllBoneMappers())
+                            {
+                                try
+                                {
+                                    if (otherMapper != item)
+                                    {
+                                        if (!nearestMapper && (otherMapper.currentClip.syncronizeAnimation || otherMapper.currentClip.syncronizeAudio))
+                                        {
+                                            nearestMapper = otherMapper;
+                                        }
+                                        else if (nearestMapper)
+                                        {
+                                            if ((otherMapper.currentClip.syncronizeAnimation || otherMapper.currentClip.syncronizeAudio) && Vector3.Distance(item.transform.position, otherMapper.transform.position) < Vector3.Distance(item.transform.position, nearestMapper.transform.position))
+                                            {
+                                                nearestMapper = otherMapper;
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (System.Exception)
+                                {
+                                }
+                            }
+                            if (nearestMapper)
+                            {
+                                item.PlayAnim(nearestMapper.currentClip.clip[0].name, 0);
+                            }
+                        }
+                    }
+                }
+            }
+            if (newAnimation == "EnemyStand")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("StoodHere", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyBreak")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("Breakneck", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyGetDown")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("GetDown", item);
+                    }
+                }
+            }
+            if (newAnimation == "EnemyDodge")
+            {
+                foreach (var item in CustomEmotesAPI.GetAllBoneMappers())
+                {
+                    if (item != CustomEmotesAPI.localMapper)
+                    {
+                        CustomEmotesAPI.PlayAnimation("DuckThisOneIdle", item);
+                    }
+                }
+            }
+            if (newAnimation == "SpawnBody")
+            {
+                switch (Random.Range(0, 12))
+                {
+                    case 0:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Acrid");
+                        break;
+                    case 1:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Artificer");
+                        break;
+                    case 2:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Bandit2");
+                        break;
+                    case 3:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Captain");
+                        break;
+                    case 4:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Commando");
+                        break;
+                    case 5:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Engi");
+                        break;
+                    case 6:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Huntress");
+                        break;
+                    case 7:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Loader");
+                        break;
+                    case 8:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body MULT");
+                        break;
+                    case 9:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Mercenary");
+                        break;
+                    case 10:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body REX");
+                        break;
+                    case 11:
+                        RoR2.Console.instance.SubmitCmd(NetworkUser.readOnlyLocalPlayersList[0], $"spawn_body Railgunner");
+                        break;
 
-        private void CustomEmotesAPI_emoteSpotJoined_Body(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
-        {
-            //does nothing, just putting this here to show that you can do it
+                    default:
+                        break;
+                }
+            }
         }
 
         private void CustomEmotesAPI_animChanged(string newAnimation, BoneMapper mapper)
         {
-            currentAnim = newAnimation;
-        }
-        private void Update()
-        {
-            if (GetKeyDown(TPoseButton))
-            {
-                CustomEmotesAPI.PlayAnimation("T Pose"); //You can call animations manually, even if they are hidden like here. Consider naming your hidden emotes something very unique so there isn't any conflicts
-            }
-            else if (GetKeyUp(TPoseButton))
-            {
-                if (currentAnim == "T Pose")
-                {
-                    CustomEmotesAPI.PlayAnimation("none");
-                }
-            }
-        }
-
-        bool GetKeyDown(ConfigEntry<KeyboardShortcut> entry)
-        {
-            foreach (var item in entry.Value.Modifiers)
-            {
-                if (!Input.GetKey(item))
-                {
-                    return false;
-                }
-            }
-            return Input.GetKeyDown(entry.Value.MainKey);
-        }
-        bool GetKeyUp(ConfigEntry<KeyboardShortcut> entry)
-        {
-            foreach (var item in entry.Value.Modifiers)
-            {
-                if (Input.GetKeyUp(item))
-                {
-                    return true;
-                }
-            }
-            return Input.GetKeyUp(entry.Value.MainKey);
+            DEBUGHANDLE(mapper, newAnimation);
         }
     }
 }
